@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
+import Link from "next/link";
 import Bar from "../components/Bar";
-import RadioButtonsGroup from "../components/RadioButtonsGroup";
 import ImgMediaCard from "../components/ImgMediaCard";
 import {
   Typography,
   Container,
   Grid,
   Chip,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
   FormLabel,
 } from "@material-ui/core";
 import DoneIcon from "@material-ui/icons/Done";
@@ -35,7 +39,6 @@ function mealPlan() {
   ];
 
   const dishTypes = [
-    "Alcohol-cocktail",
     "Biscuits and cookies",
     "Bread",
     "Cereals",
@@ -99,10 +102,17 @@ function mealPlan() {
     "low-sodium",
   ];
 
+  const [selectedCuisine, setSelectedCuisine] = useState("American");
+  const [selectedDish, setSelectedDish] = useState("Biscuits and cookies");
+  const [selectedHealth, setSelectedHealth] = useState(["alcohol-free"]);
+  const [selectedDiet, setSelectedDiet] = useState("balanced");
+
+  //chip
   const handleDelete = () => {
     console.info("You clicked the delete icon.");
   };
 
+  //chip
   const handleClick = () => {
     console.info("You clicked the Chip.");
   };
@@ -129,16 +139,78 @@ function mealPlan() {
             <Container maxWidth="xl">
               <Grid container spacing={6}>
                 <Grid item xs={12} sm={6} md={3}>
-                  <RadioButtonsGroup
-                    title="Cuisine Types"
-                    labels={cuisineTypes}
-                  />
+                  <FormControl component="fieldset">
+                    <FormLabel component="legend">Cuisine Types</FormLabel>
+                    <RadioGroup
+                      aria-label="Cuisine Types"
+                      name="Cuisine Types"
+                      value={selectedCuisine}
+                      onChange={(event) => {
+                        setSelectedCuisine(event.target.value);
+                      }}
+                    >
+                      {cuisineTypes.map((cuisineType) => (
+                        <FormControlLabel
+                          key={uuidv4()}
+                          value={cuisineType}
+                          control={
+                            <Radio
+                              onClick={() => setSelectedCuisine(cuisineType)}
+                            />
+                          }
+                          label={cuisineType}
+                        />
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
-                  <RadioButtonsGroup title="Dish Types" labels={dishTypes} />
+                  <FormControl component="fieldset">
+                    <FormLabel component="legend">Dish Types</FormLabel>
+                    <RadioGroup
+                      aria-label="Dish Types"
+                      name="Dish Types"
+                      value={selectedDish}
+                      onChange={(event) => {
+                        setSelectedDish(event.target.value);
+                      }}
+                    >
+                      {dishTypes.map((dishType) => (
+                        <FormControlLabel
+                          key={uuidv4()}
+                          value={dishType}
+                          control={
+                            <Radio onClick={() => setSelectedDish(dishType)} />
+                          }
+                          label={dishType}
+                        />
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
-                  <RadioButtonsGroup title="Diet Labels" labels={dietLabels} />
+                  <FormControl component="fieldset">
+                    <FormLabel component="legend">Diet Labels</FormLabel>
+                    <RadioGroup
+                      aria-label="Diet Labels"
+                      name="Diet Labels"
+                      value={selectedDiet}
+                      onChange={(event) => {
+                        setSelectedDiet(event.target.value);
+                      }}
+                    >
+                      {dietLabels.map((dietLabel) => (
+                        <FormControlLabel
+                          key={uuidv4()}
+                          value={dietLabel}
+                          control={
+                            <Radio onClick={() => setSelectedDiet(dietLabel)} />
+                          }
+                          label={dietLabel}
+                        />
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                   <FormLabel component="legend">Health Labels</FormLabel>
@@ -151,11 +223,28 @@ function mealPlan() {
                         size="small"
                         deleteIcon={<DoneIcon />}
                         onDelete={handleDelete}
-                        onClick={handleClick}
+                        // if it is not exist, then set it
+                        onClick={() =>
+                          !selectedHealth.includes(healthLabel) &&
+                          setSelectedHealth([healthLabel, ...selectedHealth])
+                        }
                       />
                     ))}
                 </Grid>
               </Grid>
+              <Link
+                href={{
+                  pathname: "/meal",
+                  query: {
+                    diet: selectedDiet,
+                    health: selectedHealth,
+                    cuisineType: selectedCuisine,
+                    dishType: selectedDish,
+                  },
+                }}
+              >
+                <a>Create Meal Plan</a>
+              </Link>
             </Container>
           </div>
         ) : (
